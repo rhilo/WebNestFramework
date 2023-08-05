@@ -4,5 +4,14 @@
   "main": "index.js",
   "repository": "https://github.com/rhilo/WebNestFramework.git",
   "author": "C K <tech@easymail.no>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axiom": "^0.1.6",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3"
+  }
 }
