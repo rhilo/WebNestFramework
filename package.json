@@ -1,0 +1,8 @@
+{
+  "name": "WebNestFramework",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/rhilo/WebNestFramework.git",
+  "author": "C K <tech@easymail.no>",
+  "license": "MIT"
+}
