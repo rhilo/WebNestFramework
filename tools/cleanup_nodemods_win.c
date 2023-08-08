@@ -63,8 +63,105 @@ void searchNodeModulesRecursively(const char *path, json_t *occurrences) {
     }
 }
 
-void searchAndDryRun();
-void deleteNodeModules();
+//void searchAndDryRun();
+
+
+void searchAndDryRun() {
+    // Check if "occurrences.json" exists
+    FILE *file = fopen("occurrences.json", "r");
+    if (!file) {
+        printf("'occurrences.json' not found. Please perform a search first.\n");
+        return;
+    }
+
+    // Read "occurrences.json" into a JSON array
+    json_error_t error;
+    json_t *occurrences = json_loadf(file, 0, &error);
+    fclose(file);
+
+    if (!occurrences) {
+        printf("Error reading 'occurrences.json': %s\n", error.text);
+        return;
+    }
+
+    // Open "dryrun.log" for writing
+    FILE *dryRunLog = fopen("dryrun.log", "w");
+    if (!dryRunLog) {
+        printf("Error opening 'dryrun.log' for writing.\n");
+        json_decref(occurrences);
+        return;
+    }
+
+    printf("Dry run deletion of 'node_modules' folders:\n");
+
+    // Iterate through the occurrences and simulate deletion
+    size_t index;
+    json_t *value;
+    json_array_foreach(occurrences, index, value) {
+        const char *path = json_string_value(value);
+        printf("Would delete: %s\n", path);
+        fprintf(dryRunLog, "Would delete: %s\n", path);
+
+        // Optionally, read and log additional information (e.g., yarn.lock)
+        // ...
+    }
+
+    fclose(dryRunLog);
+    json_decref(occurrences);
+
+    printf("Dry run complete. See 'dryrun.log' for details.\n");
+}
+
+
+
+void searchAndDryRun() {
+    // Check if "occurrences.json" exists
+    FILE *file = fopen("occurrences.json", "r");
+    if (!file) {
+        printf("'occurrences.json' not found. Please perform a search first.\n");
+        return;
+    }
+
+    // Read "occurrences.json" into a JSON array
+    json_error_t error;
+    json_t *occurrences = json_loadf(file, 0, &error);
+    fclose(file);
+
+    if (!occurrences) {
+        printf("Error reading 'occurrences.json': %s\n", error.text);
+        return;
+    }
+
+    // Open "dryrun.log" for writing
+    FILE *dryRunLog = fopen("dryrun.log", "w");
+    if (!dryRunLog) {
+        printf("Error opening 'dryrun.log' for writing.\n");
+        json_decref(occurrences);
+        return;
+    }
+
+    printf("Dry run deletion of 'node_modules' folders:\n");
+
+    // Iterate through the occurrences and simulate deletion
+    size_t index;
+    json_t *value;
+    json_array_foreach(occurrences, index, value) {
+        const char *path = json_string_value(value);
+        printf("Would delete: %s\n", path);
+        fprintf(dryRunLog, "Would delete: %s\n", path);
+
+        // Optionally, read and log additional information (e.g., yarn.lock)
+        // ...
+    }
+
+    fclose(dryRunLog);
+    json_decref(occurrences);
+
+    printf("Dry run complete. See 'dryrun.log' for details.\n");
+}
+
+//void deleteNodeModules();
+
 
 int main() {
     int choice;
