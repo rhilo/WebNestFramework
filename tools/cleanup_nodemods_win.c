@@ -7,7 +7,38 @@
 
 
 // Function prototypes
-void searchNodeModules();
+//void searchNodeModules();
+void searchNodeModules() {
+    char path[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, path);
+    printf("Searching for 'node_modules' folders in: %s\n", path);
+
+    json_t *occurrences = json_array(); // JSON array to store occurrences
+
+    // Recursive function to search for 'node_modules'
+    searchNodeModulesRecursively(path, occurrences);
+
+    // Write occurrences to JSON file
+    FILE *file = fopen("occurrences.json", "w");
+    if (file) {
+        json_dumpf(occurrences, file, JSON_INDENT(4));
+        fclose(file);
+        printf("'node_modules' occurrences have been written to 'occurrences.json'.\n");
+    } else {
+        printf("Error writing to 'occurrences.json'.\n");
+    }
+
+    json_decref(occurrences); // Free JSON object
+}
+
+void searchNodeModulesRecursively(const char *path, json_t *occurrences) {
+    // Implementation for recursive search
+    // ...
+}
+
+
+
+
 void searchAndDryRun();
 void deleteNodeModules();
 
