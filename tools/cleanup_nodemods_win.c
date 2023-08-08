@@ -3,7 +3,7 @@
 #include <string.h>
 #include <windows.h>
 #include <jansson.h> // For JSON handling
-
+#include <shellapi.h> // For SHFileOperation    
 
 
 // Function prototypes
@@ -161,6 +161,67 @@ void searchAndDryRun() {
 }
 
 //void deleteNodeModules();
+
+void deleteNodeModules() {
+    // Check if "occurrences.json" exists
+    FILE *file = fopen("occurrences.json", "r");
+    if (!file) {
+        printf("'occurrences.json' not found. Please perform a search first.\n");
+        return;
+    }
+
+    // Read "occurrences.json" into a JSON array
+    json_error_t error;
+    json_t *occurrences = json_loadf(file, 0, &error);
+    fclose(file);
+
+    if (!occurrences) {
+        printf("Error reading 'occurrences.json': %s\n", error.text);
+        return;
+    }
+
+    // Confirm deletion with the user
+    char confirmation;
+    printf("Are you sure you want to delete the 'node_modules' folders listed in 'occurrences.json'? (y/n): ");
+    scanf(" %c", &confirmation);
+    if (confirmation != 'y' && confirmation != 'Y') {
+        printf("Deletion canceled.\n");
+        json_decref(occurrences);
+        return;
+    }
+
+    printf("Deleting 'node_modules' folders:\n");
+
+    // Iterate through the occurrences and delete each directory
+    size_t index;
+    json_t *value;
+    json_array_foreach(occurrences, index, value) {
+        const char *path = json_string_value(value);
+
+        // Check for permission issues
+        if (!hasWritePermission(path)) {
+            printf("Permission denied: %s\n", path);
+            continue;
+        }
+
+        // Delete the directory
+        SHFILEOPSTRUCT fileOp = { 0 };
+        fileOp.wFunc = FO_DELETE;
+        fileOp.pFrom = path;
+        fileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+        int result = SHFileOperation(&fileOp);
+
+        if (result == 0) {
+            printf("Deleted: %s\n", path);
+        } else {
+            printf("Error deleting: %s\n", path);
+        }
+    }
+
+    json_decref(occurrences);
+
+    printf("Deletion complete.\n");
+}
 
 
 int main() {
