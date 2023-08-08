@@ -32,12 +32,36 @@ void searchNodeModules() {
 }
 
 void searchNodeModulesRecursively(const char *path, json_t *occurrences) {
-    // Implementation for recursive search
-    // ...
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind = FindFirstFile(strcat(path, "\\*"), &findFileData);
+
+    if (hFind == INVALID_HANDLE_VALUE) {
+        return;
+    } else {
+        do {
+            if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                // Check if the directory is named "node_modules"
+                if (strcmp(findFileData.cFileName, "node_modules") == 0) {
+                    // Construct the full path to the "node_modules" directory
+                    char nodeModulesPath[MAX_PATH];
+                    snprintf(nodeModulesPath, sizeof(nodeModulesPath), "%s\\%s", path, findFileData.cFileName);
+
+                    // Log to console
+                    printf("Found: %s\n", nodeModulesPath);
+
+                    // Add to JSON array
+                    json_array_append_new(occurrences, json_string(nodeModulesPath));
+                } else if (strcmp(findFileData.cFileName, ".") != 0 && strcmp(findFileData.cFileName, "..") != 0) {
+                    // Recursively search in subdirectories
+                    char subPath[MAX_PATH];
+                    snprintf(subPath, sizeof(subPath), "%s\\%s", path, findFileData.cFileName);
+                    searchNodeModulesRecursively(subPath, occurrences);
+                }
+            }
+        } while (FindNextFile(hFind, &findFileData) != 0);
+        FindClose(hFind);
+    }
 }
-
-
-
 
 void searchAndDryRun();
 void deleteNodeModules();
